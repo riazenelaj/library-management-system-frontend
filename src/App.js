@@ -8,8 +8,11 @@ import { ReviewsProvider } from './component/ReviewsProvider';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthorsList from './view/AuthorsList';
-import AddAuthor from './component/AddAuthor';
-import AddBook from './component/AddBook';
+import AddAuthor from './forms/AddAuthor';
+import AuthorEditForm from './forms/AuthorEditForm';
+import SearchBar from './forms/SearchBar';
+import CreateBookForm from "./forms/CreateBookForm"
+
 
 function App() {
   return (
@@ -22,7 +25,11 @@ function App() {
             <Route path="/edit/:id" element={<BookEditForm />} />
             <Route path="/authors" element={<AuthorsList />} />
             <Route path="/authors/create" element={<AddAuthor />} />
-            <Route path="/books/create" element={<AddBook />} />
+            <Route path="/books/create" element={<CreateBookForm />} />
+            <Route path="/authors/edit/:id" element={<AuthorEditForm/>} />
+            <Route path="/books/search" element={<SearchBar/>} />
+            <Route path="/authors/search" element={<AuthorsList/>} />
+            <Route path="/review/create" element={<BookDetails/>}/>
           </Routes>
         </Router>
       </ReviewsProvider>

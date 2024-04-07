@@ -1,35 +1,19 @@
-
-import React, { useContext,useEffect } from "react";
-import SideNav from "../component/SideNav";
+import React, { useContext, useState } from "react";
 import BookCard from "../component/BookCard";
-import { BookCardContext } from '../component/BookCardProvider';
-import axios from 'axios';
-import AddBook from "../component/AddBook";
-
+import { BookCardContext } from "../component/BookCardProvider";
+import axios from "axios";
+import SideNav from "../component/SideNav";
 function HomePage() {
   const { books, setBooks } = useContext(BookCardContext);
+  const [searchResults, setSearchResults] = useState([]);
 
-  useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        const response = await axios.get('http://localhost:8080/api/v1/books');
-        setBooks(response.data);
-      } catch (error) {
-        console.error('Error fetching books:', error);
-      }
-    };
-
-    fetchBooks();
-  }, []);
-  
   return (
     <div className="container">
       <SideNav />
       <div className="book-card-list">
-        {books.map((book) => (
-          <BookCard key={book.id} book={book} />
-        ))}
-        {/* <AddBook/> */}
+        {searchResults.length > 0
+          ? searchResults.map((book) => <BookCard key={book.id} book={book} />)
+          : books.map((book) => <BookCard key={book.id} book={book} />)}
       </div>
     </div>
   );

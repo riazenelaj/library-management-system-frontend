@@ -1,12 +1,14 @@
-import * as React from "react";
-import { styled, useTheme, alpha } from "@mui/material/styles";
+import React, { useContext, useState } from "react";
+import BookCard from "../component/BookCard";
+import { BookCardContext } from "../component/BookCardProvider";
+import axios from "axios";
+import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
 import CssBaseline from "@mui/material/CssBaseline";
-import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -15,11 +17,13 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import SearchIcon from "@mui/icons-material/Search";
 import InputBase from "@mui/material/InputBase";
 import PersonIcon from "@mui/icons-material/Person";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import { useNavigate } from "react-router-dom";
+import { styled, useTheme, alpha } from "@mui/material/styles";
+import SearchIcon from "@mui/icons-material/Search";
+import SearchBar from "../forms/SearchBar";
 
 const drawerWidth = 180;
 
@@ -71,7 +75,6 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
@@ -89,9 +92,52 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-export default function MiniDrawer() {
+const Search = styled("div")(({ theme }) => ({
+  position: "relative",
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginLeft: 0,
+  width: "100%",
+  [theme.breakpoints.up("sm")]: {
+    marginLeft: theme.spacing(1),
+    width: "auto",
+  },
+}));
+
+const SearchIconWrapper = styled("div")(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: "100%",
+  position: "absolute",
+  pointerEvents: "none",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: "inherit",
+  "& .MuiInputBase-input": {
+    padding: theme.spacing(1, 1, 1, 0),
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create("width"),
+    width: "100%",
+    [theme.breakpoints.up("sm")]: {
+      width: "12ch",
+      "&:focus": {
+        width: "20ch",
+      },
+    },
+  },
+}));
+
+function SideNav() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const { setBooks } = useContext(BookCardContext);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -101,46 +147,15 @@ export default function MiniDrawer() {
     setOpen(false);
   };
 
-  const Search = styled("div")(({ theme }) => ({
-    position: "relative",
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    "&:hover": {
-      backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    marginLeft: 0,
-    width: "100%",
-    [theme.breakpoints.up("sm")]: {
-      marginLeft: theme.spacing(1),
-      width: "auto",
-    },
-  }));
-
-  const SearchIconWrapper = styled("div")(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: "100%",
-    position: "absolute",
-    pointerEvents: "none",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  }));
-
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: "inherit",
-    "& .MuiInputBase-input": {
-      padding: theme.spacing(1, 1, 1, 0),
-      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create("width"),
-      width: "100%",
-      [theme.breakpoints.up("sm")]: {
-        width: "12ch",
-        "&:focus": {
-          width: "20ch",
-        },
-      },
-    },
-  }));
+  const handleSearch = async (query) => {
+    try {
+      const response = await axios.get(`http://localhost:8080/api/v1/books/search?query=${query}`);
+      setSearchResults(response.data);
+    } catch (error) {
+      console.error('Error searching books:', error);
+      setSearchResults([]);
+    }
+  };
 
   const navigate = useNavigate();
 
@@ -177,15 +192,7 @@ export default function MiniDrawer() {
           >
             Book Land
           </Typography>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ "aria-label": "search" }}
-            />
-          </Search>
+          <SearchBar/>
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
@@ -203,13 +210,13 @@ export default function MiniDrawer() {
             {
               text: "Authors",
               icon: <PersonIcon />,
-              onClick: navigateToAuthorsList, 
+              onClick: navigateToAuthorsList,
             },
-            { text: "Books", icon: <MenuBookIcon /> , onClick: navigateToAddBook  },
+            { text: "Books", icon: <MenuBookIcon />, onClick: navigateToAddBook },
           ].map((item, index) => (
             <ListItem key={item.text} disablePadding sx={{ display: "block" }}>
               <ListItemButton
-                onClick={item.onClick} 
+                onClick={item.onClick}
                 sx={{
                   minHeight: 48,
                   justifyContent: open ? "initial" : "center",
@@ -225,10 +232,7 @@ export default function MiniDrawer() {
                 >
                   {item.icon}
                 </ListItemIcon>
-                <ListItemText
-                  primary={item.text}
-                  sx={{ opacity: open ? 1 : 0 }}
-                />
+                <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
               </ListItemButton>
             </ListItem>
           ))}
@@ -237,3 +241,5 @@ export default function MiniDrawer() {
     </Box>
   );
 }
+
+export default SideNav;

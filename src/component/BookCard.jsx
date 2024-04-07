@@ -1,43 +1,38 @@
-import React from "react";
-import Card from "@mui/material/Card";
-import CardActionArea from "@mui/material/CardActionArea";
-import CardMedia from "@mui/material/CardMedia";
-import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
-import { Paper } from "@mui/material";
-import { HandymanOutlined } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import Card from '@mui/material/Card';
+import CardActionArea from '@mui/material/CardActionArea';
+import CardMedia from '@mui/material/CardMedia';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import { Paper } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 function BookCard({ book }) {
-  console.log(book)
-  const { imageData, title, author, description,id } = book;
-  const  navigate=useNavigate();
-  console.log(id)
-  const handleNavigate=(id)=>{
+  const { imageData, title, author, description, id } = book;
+  const { name, surname } = author || {};
+  const navigate = useNavigate();
 
-    navigate(`books/${id}`)
-}
-  const { name, surname } = author;
+  const handleNavigate = () => {
+    navigate(`books/${id}`);
+  };
+  const imageSrc = imageData || 'https://bookcart.azurewebsites.net/Upload/Default_image.jpg';
+
+
   return (
-    <Paper elevation={4}>
-      <Card  onClick={()=>{handleNavigate(id)}}
+    <Paper elevation={5}>
+      <Card
+        onClick={handleNavigate}
         sx={{
-          display: "flex",
+          display: 'flex',
           width: 345,
           height: 270,
-          backgroundColor: "#f0ffff",
-        }
-      }
+          backgroundColor: '#f0ffff',
+        }}
       >
-        <CardActionArea sx={{ display: "flex" }}>
-          <CardMedia
-            component="img"
-            sx={{ width: 180, height: 270 }}
-            src={imageData}
-            alt={title}
-          />
+        <CardActionArea sx={{ display: 'flex',justifyContent:'space-between' }}>
+          <CardMedia component="img" sx={{ width: 180, height: 270 }} src={imageSrc} alt={title} />
           <CardContent sx={{ flex: 1 }}>
-            <div style={{ display: "flex", flexDirection: "column" }}>
+            <div style={{ display: 'flex', flexDirection: 'column',justifyContent:'space-between' }}>
               <Typography gutterBottom variant="h5" component="div">
                 {title}
               </Typography>
@@ -48,7 +43,7 @@ function BookCard({ book }) {
           </CardContent>
         </CardActionArea>
       </Card>
-      </Paper>
+    </Paper>
   );
 }
 
