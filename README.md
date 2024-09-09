@@ -21,7 +21,7 @@ Since the focus of the overall project was primarily on back-end development, th
 
 1. Clone the repository:
    bash
-   git clone https://github.com/riazenelaj/library-management-system-FE.git
+   git clone https://github.com/riazenelaj/library-management-system-fontend.git
    
 2. Install dependencies:
    bash
